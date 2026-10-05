@@ -1,0 +1,23 @@
+name: Security Review
+
+# Läuft automatisch bei jedem Pull Request
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write  # damit Claude Kommentare an den PR schreiben darf
+  contents: read        # damit Claude den Code lesen darf
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+
+      - uses: anthropics/claude-code-security-review@main
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
